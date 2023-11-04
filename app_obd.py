@@ -15,6 +15,7 @@ class OBD:
 
 obd_status = ["Disconnected", "Connected", "Connection...", "wtf"]
 obd_speed_lock = threading.Lock()
+obd_speed_rpm = threading.Lock()
 
 try:
     print(obd_status[2])
@@ -31,24 +32,30 @@ def get_speedtime():
     return [str(time_now), speed]
 
 @socketio.on('obd')
-def obd_connection():
-        
+def obd_connection():  
     if connection.is_connected():
         print(obd_status[1])
         socketio.emit('obd_status', obd_status[1])
         print("OBD connection established.")
 
     else:
+        print("OBD connection failed.")
         print(obd_status[0])
+
         socketio.emit('obd_status', obd_status[0])
         socketio.emit('obd_speed', "-")
-        socketio.emit('obd_error', "-")
+        socketio.emit('obm_error', "-")
+        socketio.emit('obd_rpm', "-")
 
-        # test speed while offline
-        print("OBD connection failed.")
-        thread = Thread(target=obd_speed)
-        thread.daemon = True
-        thread.start()
+        # debug speed for testing
+        thread_speed = Thread(target=obd_speed)
+        thread_speed.daemon = True
+        thread_speed.start()
+
+        # debug rpm for testing
+        thread_rpm = Thread(target=obd_rpm)
+        thread_rpm.daemon = True
+        thread_rpm.start()
             
 def obd_speed():
     obd_speed_lock.acquire()
@@ -70,4 +77,27 @@ def obd_speed():
     finally:
         obd_speed_lock.release()
         
+def obd_rpm():
+    obd_speed_lock.acquire()
+    cmd = obd.commands.RPM  # select an OBD command (sensor)
+    response = connection.query(cmd)  # send the command and parse the response
+    loop = True
+    try:
+        while loop == True:
+            global rpm
+            speed = speed + 1
+            time.sleep(1)
+            if response.is_null():
+                    print("No data received. #"+ str(get_speedtime()))
+                    socketio.emit('obd_speed', get_speedtime())
+            else:   
+                    print("RPM:", response.value) 
+                    socketio.emit('obd_speed', response.value.to("kph"))
+    finally:
+        obd_rpm_lock.release()
 
+def kill_obd(obd_type):
+    if obd_type == "speed":
+        obd_speed.loop = False
+    elif obd_type == "rpm":
+        obd_rpm.loop = False

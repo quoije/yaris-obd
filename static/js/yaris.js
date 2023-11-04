@@ -13,6 +13,7 @@ chart = new Chart(ctx, {
         }]
     },
     options: {
+        responsive: true,
         scales: {
             x: {
                 reverse: true,
@@ -64,13 +65,18 @@ socket.on('obd_speed', function(data) {
     }
 
     // Update the chart
-
     chart.update();
 
 });
 
+socket.on('obd_rpm', function(data) {
+    console.log("obd rpm "+data);
+    const status = document.getElementById('obd-rpm');
+    status.innerHTML = data;
+});
+
 socket.on('obd_error', function(data) {
-    console.log(data);
+    console.log("obd errors "+data);
     const status = document.getElementById('obd-error');
     status.innerHTML = data;
 });

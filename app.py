@@ -14,6 +14,10 @@ def index():
     print("hello "+account.name)
     return render_template('index.html', account = account)
 
+@app.route('/dtc')
+def dtc():
+    return render_template('dtc.html')
+
 # not sure if im gonna use this
 @app.route('/api/obd_speed/')
 def data():
