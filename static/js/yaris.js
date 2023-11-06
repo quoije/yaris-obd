@@ -38,6 +38,14 @@ socket.on('connect', function(data) {
     console.log('socket.io is connected')
 });
 
+socket.on('account_info', function(data) {
+    console.log(data);
+
+    // car model
+    const car_model = document.getElementById('index-car-model');
+    car_model.innerHTML = data;
+});
+
 socket.on('obd_status', function(data) {
     console.log(data);
     const status = document.getElementById('obd-status');
@@ -72,6 +80,12 @@ socket.on('obd_speed', function(data) {
 socket.on('obd_rpm', function(data) {
     console.log("obd rpm "+data);
     const status = document.getElementById('obd-rpm');
+    status.innerHTML = data;
+});
+
+socket.on('obd_dtc', function(data) {
+    console.log("obd dtc "+data);
+    const status = document.getElementById('obd-dtc');
     status.innerHTML = data;
 });
 
