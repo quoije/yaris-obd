@@ -1,6 +1,6 @@
 from flask_socketio import SocketIO
 from threading import Thread
-import app_obd, time, threading
+import app_obd, app_account, time, threading
 
 socketio = SocketIO()
 uptime_lock = threading.Lock()
@@ -9,7 +9,6 @@ uptime_lock = threading.Lock()
 def connect_event():
     print('Client connected')
     print('Getting OBD status...')
-    app_obd.obd_connection()
     uptime()
 
 def uptime():

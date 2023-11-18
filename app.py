@@ -1,18 +1,15 @@
 from flask import Flask, render_template, make_response, json
-import app_obd, app_car, app_account, time
+import app_obd, app_car, app_account, time, app_events
 from app_events import socketio
 
 app = Flask(__name__)
 socketio.init_app(app)
-
-account = app_account.Account()
-obd = app_obd.OBD()
-car = app_car.Car()
+app_obd.obd_connection()
 
 @app.route('/')
 def index():
-    print("hello "+account.name)
-    return render_template('index.html', account = account)
+    print("hello")
+    return render_template('index.html')
 
 @app.route('/dtc')
 def dtc():
@@ -25,3 +22,14 @@ def data():
     response = make_response(json.dumps(data))
     response.content_type = 'application/json'
     return response
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Run the Flask application with a custom port."
+    )
+    parser.add_argument(
+        "--port", type=int, default=5000, help="Port number (default is 5000)"
+    )
+    args = parser.parse_args()
+
+    app.run(debug=True, port=args.port)

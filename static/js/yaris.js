@@ -32,6 +32,10 @@ chart = new Chart(ctx, {
     }
 });
 
+// account
+
+
+
 // websockets
 
 socket.on('connect', function(data) {
@@ -41,7 +45,7 @@ socket.on('connect', function(data) {
 socket.on('account_info', function(data) {
     console.log(data);
 
-    // car model
+// car model
     const car_model = document.getElementById('index-car-model');
     car_model.innerHTML = data;
 });
