@@ -6,7 +6,8 @@ from threading import Thread
 status = None
 speed = 0
 rpm = 0
-
+coonnection = None
+    
 class OBD:
     def __init__(self):
         self.status = status
@@ -19,13 +20,6 @@ obd_rpm_lock = threading.Lock()
 obd_dtc_lock = threading.Lock()
 obd_state_lock = threading.Lock()
 
-try:
-    print(obd_status[2])
-    connection = obd.OBD()  # put linux /dev/rfi... something in () for the rpi bluetooth adpater
-
-except Exception as e:
-    print("An error occurred:", str(e))
-
 def get_speedtime():
     global speed
     date = datetime.now()
@@ -34,6 +28,14 @@ def get_speedtime():
     return [str(time_now), speed]
 
 def obd_connection():
+    global connection
+    try:
+        print(obd_status[2])
+        connection = obd.OBD()  # put linux /dev/rfi... something in () for the rpi bluetooth adpater
+
+    except Exception as e:
+        print("An error occurred:", str(e))
+
     if connection.is_connected():
         print(obd_status[1])
         print("OBD connection established.")
@@ -77,6 +79,7 @@ def obd_state(status):
     loop = True
     try:
         while loop == True:
+            print(obd_status[status])
             socketio.emit('obd_status', obd_status[status])
             time.sleep(2)
     finally:
@@ -89,6 +92,7 @@ def obd_speed():
     loop = True
     try:
         while loop == True:
+            print(obd_status[3])
             socketio.emit('obd_status', obd_status[3])
             global speed
             speed = speed + 1
