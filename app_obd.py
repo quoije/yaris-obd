@@ -44,19 +44,20 @@ def obd_connection():
     else:
         print("OBD connection failed.")
         print(obd_status[0])
-        obd_events(2)
+        obd_events(0)
 
 @socketio.on('obd')
 def obd_events(status):  
     if status == 1:
-        thread_speed = Thread(target=obd_state(1))
-        thread_speed.daemon = True
-        thread_speed.start()
+        thread_state = Thread(target=obd_state(1))
+        thread_state.daemon = True
+        thread_state.start()
 
-    elif status == 2:
-        thread_speed = Thread(target=obd_state(2))
-        thread_speed.daemon = True
-        thread_speed.start()
+    # change status to 2 when done testing
+    elif status == 0:
+        thread_state = Thread(target=obd_state(2))
+        thread_state.daemon = True
+        thread_state.start()
 
         # debug speed for testing
         thread_speed = Thread(target=obd_speed)
@@ -75,15 +76,12 @@ def obd_events(status):
 
 
 def obd_state(status):
-    obd_state_lock.acquire()
     loop = True
-    try:
-        while loop == True:
-            print(obd_status[status])
-            socketio.emit('obd_status', obd_status[status])
-            time.sleep(2)
-    finally:
-        obd_state_lock.release()
+    while loop == True:
+        print(obd_status[status])
+        socketio.emit('obd_status', obd_status[status])
+        print("[+] websocket packet sent...")
+        time.sleep(2)
 
 def obd_speed():
     obd_speed_lock.acquire()
@@ -98,7 +96,7 @@ def obd_speed():
             speed = speed + 1
             time.sleep(1)
             if response.is_null():
-                    print("No data received. #"+ str(get_speedtime()))
+                    print("TEST SPEED for DEBUG #"+ str(get_speedtime()))
                     socketio.emit('obd_speed', get_speedtime())
             else:
                     print("Original value:", response.value) 

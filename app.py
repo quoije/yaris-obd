@@ -3,8 +3,8 @@ from flask import Flask, render_template, make_response, json
 from app_events import socketio
 
 port_number = 8000
-
 app = Flask(__name__)
+
 @app.route('/')
 def index():
     print("hello")
@@ -24,7 +24,6 @@ def data():
 
 if __name__ == '__main__':  
     socketio.init_app(app)
-
     p_obd_connection = threading.Thread(target=app_obd.obd_connection)
     p_obd_connection.start()
 

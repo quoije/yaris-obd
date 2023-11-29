@@ -10,7 +10,8 @@ os_type = ["Linux","Windows"]
 def connect_event():
     print('Client connected')
     print('Getting OBD status...')
-    uptime()
+    socketio.emit("connect", "connected with server")
+    # uptime()
 
 def uptime():
     thread = Thread(target=loop_uptime(os_type[1]))
@@ -37,6 +38,7 @@ def loop_uptime(os):
         while loop == True:
             time.sleep(1)
             socketio.emit("rpi_uptime", "1")
+            print("[+] sent uptime windows (1) packet")
             
         
 
