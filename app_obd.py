@@ -1,4 +1,4 @@
-import obd, time, threading
+import obd, time, threading, app_gps    
 from datetime import datetime
 from app_events import socketio
 from threading import Thread
@@ -15,7 +15,7 @@ class OBD:
 
 obd_status = ["Disconnected", "Connected", "Connection...", "wtf"]
 obd_speed_lock = threading.Lock()
-obd_speed_rpm = threading.Lock()
+obd_rpm_lock = threading.Lock()
 
 try:
     print(obd_status[2])
@@ -69,6 +69,7 @@ def obd_speed():
             time.sleep(1)
             if response.is_null():
                     print("No data received. #"+ str(get_speedtime()))
+                    print(app_gps.get_gps())
                     socketio.emit('obd_speed', get_speedtime())
             else:
                     print("Original value:", response.value) 

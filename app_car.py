@@ -1,4 +1,4 @@
 class Car:
     def __init__(self):
-        self.model = None
+        self.model = "Yaris 2013"
         self.obd = None

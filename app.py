@@ -1,5 +1,5 @@
 from flask import Flask, render_template, make_response, json
-import app_obd, app_car, app_account, time
+import app_obd, app_car, app_account, app_gps, time
 from app_events import socketio
 from gevent.pywsgi import WSGIServer
 
@@ -9,15 +9,21 @@ socketio.init_app(app)
 account = app_account.Account()
 obd = app_obd.OBD()
 car = app_car.Car()
+gps = app_gps.get_gps()
 
 @app.route('/')
 def index():
-    print("hello "+account.name)
-    return render_template('index.html', account = account)
+    print("hello "+ account.name)
+    print("you're car model is:" + car.model)
+    return render_template('index.html', account = account, car = car)
 
 @app.route('/dtc')
 def dtc():
-    return render_template('dtc.html')
+    return render_template('dtc.html', account = account, car = car)
+
+@app.route('/dash')
+def dash():
+    return render_template('dash.html', account = account, car = car)
 
 # not sure if im gonna use this
 @app.route('/api/obd_speed/')
