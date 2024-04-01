@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 
-load_dotenv("./creds.env")
+load_dotenv("../db/creds.env")
 
 mUser = os.getenv()
 mPass = os.getenv()
