@@ -1,15 +1,15 @@
 from flask import Flask, render_template, make_response, json
-import app_obd, app_car, app_account, app_gps, time
-from app_events import socketio
+import modules.app_obd, modules.app_car, modules.app_account, modules.app_gps, time
+from modules.app_events import socketio
 from gevent.pywsgi import WSGIServer
 
 app = Flask(__name__)
 socketio.init_app(app)
 
-account = app_account.Account()
-obd = app_obd.OBD()
-car = app_car.Car()
-gps = app_gps.get_gps()
+account = modules.app_account.Account()
+obd = modules.app_obd.OBD()
+car = modules.app_car.Car()
+gps = modules.app_gps.get_gps()
 
 @app.route('/')
 def index():
