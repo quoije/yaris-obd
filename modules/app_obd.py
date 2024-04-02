@@ -1,4 +1,4 @@
-import obd, time, threading, app_gps    
+import obd, time, threading, app_gps, app_sql
 from datetime import datetime
 from app_events import socketio
 from threading import Thread
@@ -66,11 +66,12 @@ def obd_speed():
         while loop == True:
             global speed
             speed = speed + 1
-            time.sleep(1)
+            time.sleep(10)
             if response.is_null():
                     print("No data received. #"+ str(get_speedtime()))
                     print(app_gps.get_gps())
                     socketio.emit('obd_speed', get_speedtime())
+                    app_sql.tsv_writer()
             else:
                     print("Original value:", response.value) 
                     print("Value in kph:", response.value.to("kph"))
