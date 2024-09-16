@@ -5,6 +5,7 @@ import time, threading
 
 socketio = SocketIO()
 uptime_lock = threading.Lock()
+thread_uptime = None
 
 @socketio.on('connect')
 def connect_event():
@@ -14,9 +15,15 @@ def connect_event():
     uptime()
 
 def uptime():
-    thread = Thread(target=loop_uptime)
-    thread.daemon = True
-    thread.start()
+    global thread_uptime 
+
+    if thread_uptime is None or not thread_uptime.is_alive():
+        thread_uptime = Thread(target=loop_uptime)
+        thread_uptime.daemon = True
+        thread_uptime.start()
+        print(f"Uptime thread started, alive: {thread_uptime.is_alive()}")
+    else:
+        print(f"Uptime thread already running, alive: {thread_uptime.is_alive()}")
 
 def loop_uptime():
     uptime_lock.acquire()

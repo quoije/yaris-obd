@@ -16,6 +16,8 @@ class OBD:
 obd_status = ["Disconnected", "Connected", "Connection...", "wtf"]
 obd_speed_lock = threading.Lock()
 obd_rpm_lock = threading.Lock()
+thread_speed = None
+thread_rpm = None
 
 try:
     print(obd_status[2])
@@ -31,12 +33,14 @@ def get_speedtime():
     time_now = str(date.strftime("%H:%M:%S"))
     return [str(time_now), speed]
 
-def obd_connection():  
+
+def obd_connection():
+    global thread_speed, thread_rpm 
+
     if connection.is_connected():
         print(obd_status[1])
         app_events.socketio.emit('obd_status', obd_status[1])
         print("OBD connection established.")
-
     else:
         print("OBD connection failed.")
         print(obd_status[0])
@@ -46,16 +50,18 @@ def obd_connection():
         app_events.socketio.emit('obm_error', "-")
         app_events.socketio.emit('obd_rpm', "-")
 
-        # debug speed for testing
-        thread_speed = Thread(target=obd_speed)
-        thread_speed.daemon = True
-        thread_speed.start()
+        if thread_speed is None or not thread_speed.is_alive():
+            thread_speed = Thread(target=obd_speed)
+            print(f'thread_speed alive? {thread_speed.is_alive()}')
+            thread_speed.daemon = True
+            thread_speed.start()
 
-        # debug rpm for testing
-        thread_rpm = Thread(target=obd_rpm)
-        thread_rpm.daemon = True
-        thread_rpm.start()
-            
+        if thread_rpm is None or not thread_rpm.is_alive():
+            thread_rpm = Thread(target=obd_rpm)
+            print(f'thread_rpm alive? {thread_rpm.is_alive()}')
+            thread_rpm.daemon = True
+            thread_rpm.start()
+
 def obd_speed():
     obd_speed_lock.acquire()
     cmd = obd.commands.SPEED  # select an OBD command (sensor)
@@ -65,7 +71,7 @@ def obd_speed():
         while loop == True:
             global speed
             speed = speed + 1
-            time.sleep(10)
+            time.sleep(2)
             if response.is_null():
                     print("No data received. #"+ str(get_speedtime()))
                     print(app_gps.get_gps())
