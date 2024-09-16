@@ -1,6 +1,7 @@
 from flask_socketio import SocketIO
 from threading import Thread
-import app_obd, time, threading
+from modules import app_obd
+import time, threading
 
 socketio = SocketIO()
 uptime_lock = threading.Lock()

@@ -1,15 +1,16 @@
 from flask import Flask, render_template, make_response, json
-import modules.app_obd, modules.app_car, modules.app_account, modules.app_gps, time
-from modules.app_events import socketio
+from modules import app_gps, app_events, app_car, app_account, app_gps,app_obd 
+import time
 from gevent.pywsgi import WSGIServer
 
-app = Flask(__name__)
-socketio.init_app(app)
 
-account = modules.app_account.Account()
-obd = modules.app_obd.OBD()
-car = modules.app_car.Car()
-gps = modules.app_gps.get_gps()
+app = Flask(__name__)
+app_events.socketio.init_app(app)
+
+account = app_account.Account()
+obd = app_obd.OBD()
+car = app_car.Car()
+gps = app_gps.get_gps()
 
 @app.route('/')
 def index():
@@ -38,6 +39,6 @@ if __name__ == '__main__':
     # app.run(debug=True, host="0.0.0.0", port="5000")
     # Production
     http_server = WSGIServer(('', 5000), app)
-    print("server on :5000")
+    print("server on http://localhost:5000")
     http_server.serve_forever()
     

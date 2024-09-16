@@ -1,11 +1,11 @@
 import sqlite3
-import app_obd, app_car, app_account, app_gps
+from modules import app_obd, app_car, app_account, app_gps
 from datetime import datetime
 from sqlite3 import Error
 
 currentdatetime = datetime.now()
-account = app_account.Account
-car = app_car.Car
+account = app_account.Account()
+car = app_car.Car()
 sCarModel = ''.join(letter for letter in car.model if letter.isalnum())
 sql_file = account.name + "_" + sCarModel + ".db"
 sql_path = "../db/sql/" + sql_file

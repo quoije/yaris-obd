@@ -1,6 +1,6 @@
-import obd, time, threading, app_gps, app_sql
+from modules import app_gps, app_sql, app_events
+import obd, time, threading
 from datetime import datetime
-from app_events import socketio
 from threading import Thread
 
 status = None
@@ -31,21 +31,20 @@ def get_speedtime():
     time_now = str(date.strftime("%H:%M:%S"))
     return [str(time_now), speed]
 
-@socketio.on('obd')
 def obd_connection():  
     if connection.is_connected():
         print(obd_status[1])
-        socketio.emit('obd_status', obd_status[1])
+        app_events.socketio.emit('obd_status', obd_status[1])
         print("OBD connection established.")
 
     else:
         print("OBD connection failed.")
         print(obd_status[0])
 
-        socketio.emit('obd_status', obd_status[0])
-        socketio.emit('obd_speed', "-")
-        socketio.emit('obm_error', "-")
-        socketio.emit('obd_rpm', "-")
+        app_events.socketio.emit('obd_status', obd_status[0])
+        app_events.socketio.emit('obd_speed', "-")
+        app_events.socketio.emit('obm_error', "-")
+        app_events.socketio.emit('obd_rpm', "-")
 
         # debug speed for testing
         thread_speed = Thread(target=obd_speed)
@@ -70,12 +69,11 @@ def obd_speed():
             if response.is_null():
                     print("No data received. #"+ str(get_speedtime()))
                     print(app_gps.get_gps())
-                    socketio.emit('obd_speed', get_speedtime())
-                    app_sql.tsv_writer()
+                    app_events.socketio.emit('obd_speed', get_speedtime())
             else:
                     print("Original value:", response.value) 
                     print("Value in kph:", response.value.to("kph"))
-                    socketio.emit('obd_speed', response.value.to("kph"))
+                    app_events.socketio.emit('obd_speed', response.value.to("kph"))
     finally:
         obd_speed_lock.release()
         
@@ -91,10 +89,10 @@ def obd_rpm():
             time.sleep(1)
             if response.is_null():
                     print("No data received. #"+ str(get_speedtime()))
-                    socketio.emit('obd_speed', get_speedtime())
+                    app_events.socketio.emit('obd_speed', get_speedtime())
             else:   
                     print("RPM:", response.value) 
-                    socketio.emit('obd_speed', response.value.to("kph"))
+                    app_events.socketio.emit('obd_speed', response.value.to("kph"))
     finally:
         obd_rpm_lock.release()
 

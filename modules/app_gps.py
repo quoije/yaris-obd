@@ -1,4 +1,4 @@
-from app_events import socketio
+from modules.app_events import socketio
 from threading import Thread
 
 class GPS:
