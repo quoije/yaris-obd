@@ -1,4 +1,13 @@
 const socket = io();
+// map
+
+var map = L.map('map').setView([48.505, -0.09], 13);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            L.marker([51.5, -0.09]).addTo(map)
+            .bindPopup('your car... soon(tm)')
+            .openPopup();
 
 // charts
 
@@ -84,4 +93,13 @@ socket.on('obd_error', function(data) {
 socket.on('rpi_uptime', function(data) {
     const status = document.getElementById('rpi-uptime');
     status.innerHTML = data;
+});
+
+socket.on('gps_location', function(data) {
+    console.log("location received")
+    const LocationX = document.getElementById('gpsLocationX');
+    const LocationY = document.getElementById('gpsLocationY');
+    LocationX.innerHTML = data[0];
+    LocationY.innerHTML = data[1];
+
 });

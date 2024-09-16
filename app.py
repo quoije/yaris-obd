@@ -1,22 +1,30 @@
 from flask import Flask, render_template, make_response, json
-import app_obd, app_car, app_account, time
-from app_events import socketio
+from modules import app_gps, app_events, app_car, app_account, app_gps,app_obd 
+import time
+from gevent.pywsgi import WSGIServer
+
 
 app = Flask(__name__)
-socketio.init_app(app)
+app_events.socketio.init_app(app)
 
 account = app_account.Account()
 obd = app_obd.OBD()
 car = app_car.Car()
+gps = app_gps.get_gps()
 
 @app.route('/')
 def index():
-    print("hello "+account.name)
-    return render_template('index.html', account = account)
+    print("hello "+ account.name)
+    print("you're car model is:" + car.model)
+    return render_template('index.html', account = account, car = car)
 
 @app.route('/dtc')
 def dtc():
-    return render_template('dtc.html')
+    return render_template('dtc.html', account = account, car = car)
+
+@app.route('/dash')
+def dash():
+    return render_template('dash.html', account = account, car = car)
 
 # not sure if im gonna use this
 @app.route('/api/obd_speed/')
@@ -25,3 +33,12 @@ def data():
     response = make_response(json.dumps(data))
     response.content_type = 'application/json'
     return response
+
+if __name__ == '__main__':
+    # Debug/Development
+    # app.run(debug=True, host="0.0.0.0", port="5000")
+    # Production
+    http_server = WSGIServer(('', 5000), app)
+    print("server on http://localhost:5000")
+    http_server.serve_forever()
+    
